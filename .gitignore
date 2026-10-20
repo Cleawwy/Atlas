@@ -1,0 +1,30 @@
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Local databases and vector stores
+*.db
+*.sqlite
+*.sqlite3
+milvus_data/
+
+# Data caches & generated outputs
+data/raw/
+outputs/results/
+!outputs/maps/*.html
+!outputs/maps/*.png
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
