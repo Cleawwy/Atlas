@@ -91,6 +91,44 @@ class AtlasIndexer:
         print(f"[Indexer] Successfully indexed {len(entries)} places into {self.db_path}.")
         return len(entries)
 
+    def add_single_document(
+        self,
+        name: str,
+        text: str,
+        latitude: float,
+        longitude: float,
+        category: str = "custom",
+        subcategory: str = "place",
+        address: str = "",
+        opening_hours: str = "",
+        doc_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Embeds a single custom place document and appends it to Milvus Lite.
+        Does not drop or reset existing records.
+        """
+        self.init_collection(drop_existing=False)
+        if not doc_id:
+            import uuid
+            doc_id = f"custom_{uuid.uuid4().hex[:8]}"
+
+        emb = self.encoder.encode([text], normalize_embeddings=True)[0]
+        entry = {
+            "id": doc_id,
+            "vector": emb.tolist(),
+            "name": name,
+            "category": category,
+            "subcategory": subcategory,
+            "latitude": float(latitude),
+            "longitude": float(longitude),
+            "address": address,
+            "opening_hours": opening_hours,
+            "text": text,
+        }
+        self.client.insert(collection_name=COLLECTION_NAME, data=[entry])
+        print(f"[Indexer] Document '{name}' (ID: {doc_id}) added to Milvus Lite.")
+        return entry
+
     def search(
         self,
         query: str,
