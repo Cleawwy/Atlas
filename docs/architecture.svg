@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1460 490" width="100%" height="100%" style="background: transparent;">
+  <defs>
+    <style>
+      .label-track {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        fill: #9CA3AF;
+        text-transform: uppercase;
+      }
+      .node-title {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        fill: #18181B;
+      }
+      .node-sub {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 10px;
+        font-weight: 400;
+        fill: #52525B;
+      }
+      .formula-text {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 9.5px;
+        font-weight: 600;
+        fill: #D96B4E;
+      }
+      .node-box {
+        fill: #FFFFFF;
+        stroke: #D4D4D8;
+        stroke-width: 1.2;
+        rx: 8;
+        ry: 8;
+      }
+      .node-box-hero {
+        fill: #FFFFFF;
+        stroke: #C25E43;
+        stroke-width: 1.8;
+        rx: 8;
+        ry: 8;
+      }
+      .arrow-line {
+        stroke: #8C8C96;
+        stroke-width: 1.2;
+        fill: none;
+      }
+      .arrow-accent-dashed {
+        stroke: #C25E43;
+        stroke-width: 1.3;
+        stroke-dasharray: 4, 4;
+        fill: none;
+      }
+    </style>
+
+    <!-- Subtle Muted Arrow for connectors -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#8C8C96" />
+    </marker>
+
+    <!-- Terracotta Accent Arrow for Milvus -> Retriever connector -->
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 1 2 L 7 5 L 1 8 z" fill="#C25E43" />
+    </marker>
+  </defs>
+
+  <!-- ========================================== -->
+  <!-- PIPELINE 1: INGESTION (OFFLINE)           -->
+  <!-- ========================================== -->
+
+  <!-- Left Margin Label (Ingestion) -->
+  <text x="35" y="99" class="label-track">INGESTION</text>
+  <text x="35" y="113" class="label-track" style="font-size: 8px; fill: #9CA3AF;">(OFFLINE)</text>
+
+  <!-- Node 1.1: OSM / Overpass API (220px) -->
+  <g transform="translate(140, 65)">
+    <rect width="220" height="76" class="node-box" />
+    <text x="110" y="34" text-anchor="middle" class="node-title">OSM / Overpass API</text>
+    <text x="110" y="54" text-anchor="middle" class="node-sub">Source place nodes &amp; amenities</text>
+  </g>
+
+  <!-- Arrow 1.1 -> 1.2 -->
+  <line x1="360" y1="103" x2="395" y2="103" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 1.2: Document Builder (220px) -->
+  <g transform="translate(395, 65)">
+    <rect width="220" height="76" class="node-box" />
+    <text x="110" y="34" text-anchor="middle" class="node-title">Document Builder</text>
+    <text x="110" y="54" text-anchor="middle" class="node-sub">Synthesizes tags into place profiles</text>
+  </g>
+
+  <!-- Arrow 1.2 -> 1.3 -->
+  <line x1="615" y1="103" x2="650" y2="103" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 1.3: MiniLM Embeddings (220px) -->
+  <g transform="translate(650, 65)">
+    <rect width="220" height="76" class="node-box" />
+    <text x="110" y="34" text-anchor="middle" class="node-title">MiniLM Embeddings</text>
+    <text x="110" y="54" text-anchor="middle" class="node-sub">Dense 384-dim semantic vectors</text>
+  </g>
+
+  <!-- Arrow 1.3 -> 1.4 -->
+  <line x1="870" y1="103" x2="905" y2="103" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 1.4: Milvus Lite Store (220px) -->
+  <g transform="translate(905, 65)">
+    <rect width="220" height="76" class="node-box" />
+    <text x="110" y="34" text-anchor="middle" class="node-title">Milvus Lite Store</text>
+    <text x="110" y="54" text-anchor="middle" class="node-sub">Vector index &amp; place metadata</text>
+  </g>
+
+
+  <!-- ========================================== -->
+  <!-- CROSS-PIPELINE CONNECTION: MILVUS -> RETRIEVER -->
+  <!-- ========================================== -->
+
+  <!-- Precision right-angle connector from Milvus Lite center (x=1015) to Retriever center (x=700) -->
+  <path d="M 1015 141 V 205 H 700 V 285" class="arrow-accent-dashed" marker-end="url(#arrow-accent)" />
+
+
+  <!-- ========================================== -->
+  <!-- PIPELINE 2: QUERY (RUNTIME)               -->
+  <!-- ========================================== -->
+
+  <!-- Left Margin Label (Query) -->
+  <text x="35" y="320" class="label-track">QUERY</text>
+  <text x="35" y="334" class="label-track" style="font-size: 8px; fill: #9CA3AF;">(RUNTIME)</text>
+
+  <!-- Node 2.1: User Query (CLI) (190px) -->
+  <g transform="translate(140, 285)">
+    <rect width="190" height="76" class="node-box" />
+    <text x="95" y="34" text-anchor="middle" class="node-title">User Query (CLI)</text>
+    <text x="95" y="54" text-anchor="middle" class="node-sub">Prompt text or landmark intent</text>
+  </g>
+
+  <!-- Arrow 2.1 -> 2.2 -->
+  <line x1="330" y1="323" x2="365" y2="323" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 2.2: Landmark Detector (190px) -->
+  <g transform="translate(365, 285)">
+    <rect width="190" height="76" class="node-box" />
+    <text x="95" y="34" text-anchor="middle" class="node-title">Landmark Detector</text>
+    <text x="95" y="54" text-anchor="middle" class="node-sub">Resolves hubs &amp; search intent</text>
+  </g>
+
+  <!-- Arrow 2.2 -> 2.3 -->
+  <line x1="555" y1="323" x2="590" y2="323" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 2.3: Hybrid Geo-Retriever (Hero Node: 220px) -->
+  <g transform="translate(590, 285)">
+    <rect width="220" height="76" class="node-box-hero" />
+    <text x="110" y="34" text-anchor="middle" class="node-title">Hybrid Geo-Retriever</text>
+    <text x="110" y="54" text-anchor="middle" class="node-sub">Ranks by semantic fit &amp; distance</text>
+  </g>
+
+  <!-- Formula Annotation: Placed cleanly under the hero node -->
+  <text x="700" y="386" text-anchor="middle" class="formula-text">Score = 0.55 · Semantic + 0.45 · Spatial</text>
+
+
+  <!-- ========================================== -->
+  <!-- BRANCHING: RETRIEVER -> OUTPUT PATHWAYS   -->
+  <!-- ========================================== -->
+
+  <!-- Upper fork line to Generation branch (y = 255) -->
+  <path d="M 810 315 H 835 V 255 H 855" class="arrow-line" marker-end="url(#arrow)" />
+  <!-- Lower fork line to Map branch (y = 390) -->
+  <path d="M 810 331 H 835 V 390 H 855" class="arrow-line" marker-end="url(#arrow)" />
+
+
+  <!-- ========================================== -->
+  <!-- BRANCH A: GROUNDED GENERATION (UPPER)     -->
+  <!-- ========================================== -->
+
+  <!-- Node 2.4A: Prompt Builder (165px) -->
+  <g transform="translate(855, 217)">
+    <rect width="165" height="76" class="node-box" />
+    <text x="82.5" y="34" text-anchor="middle" class="node-title">Prompt Builder</text>
+    <text x="82.5" y="54" text-anchor="middle" class="node-sub">Injects context &amp; caveats</text>
+  </g>
+
+  <!-- Arrow 2.4A -> 2.5A -->
+  <line x1="1020" y1="255" x2="1055" y2="255" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 2.5A: Mistral 7B via Ollama (165px) -->
+  <g transform="translate(1055, 217)">
+    <rect width="165" height="76" class="node-box" />
+    <text x="82.5" y="34" text-anchor="middle" class="node-title">Mistral 7B (Ollama)</text>
+    <text x="82.5" y="54" text-anchor="middle" class="node-sub">Synthesizes factual advice</text>
+  </g>
+
+  <!-- Arrow 2.5A -> 2.6A -->
+  <line x1="1220" y1="255" x2="1255" y2="255" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 2.6A: CLI Response (165px) -->
+  <g transform="translate(1255, 217)">
+    <rect width="165" height="76" class="node-box" />
+    <text x="82.5" y="34" text-anchor="middle" class="node-title">CLI Response</text>
+    <text x="82.5" y="54" text-anchor="middle" class="node-sub">Grounded answer &amp; sources</text>
+  </g>
+
+
+  <!-- ========================================== -->
+  <!-- BRANCH B: VISUAL MAP RENDERER (LOWER)     -->
+  <!-- ========================================== -->
+
+  <!-- Node 2.4B: Map Renderer (180px) -->
+  <g transform="translate(855, 352)">
+    <rect width="180" height="76" class="node-box" />
+    <text x="90" y="34" text-anchor="middle" class="node-title">Map Renderer</text>
+    <text x="90" y="54" text-anchor="middle" class="node-sub">Leaflet engine with vector pins</text>
+  </g>
+
+  <!-- Arrow 2.4B -> 2.5B -->
+  <line x1="1035" y1="390" x2="1070" y2="390" class="arrow-line" marker-end="url(#arrow)" />
+
+  <!-- Node 2.5B: Route Visualization (180px) -->
+  <g transform="translate(1070, 352)">
+    <rect width="180" height="76" class="node-box" />
+    <text x="90" y="34" text-anchor="middle" class="node-title">Route Visualization</text>
+    <text x="90" y="54" text-anchor="middle" class="node-sub">Split view &amp; numbered pins</text>
+  </g>
+
+</svg>
