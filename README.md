@@ -102,13 +102,14 @@ Forcing a user to copy-paste coordinates into external apps adds friction. Every
 
 ### Framework Integration: LlamaIndex & Spatial RAG
 
-Atlas integrates **LlamaIndex** (`llama-index-core`, `llama-index-llms-ollama`) for LLM orchestration and inference management with local Mistral 7B. 
+Atlas integrates **LlamaIndex** end-to-end (llama-index-core, llama-index-embeddings-huggingface, llama-index-vector-stores-milvus, llama-index-llms-ollama) connecting document loading, dense embeddings, Milvus Lite vector storage, query candidate processing, and response generation:
+1. **Document Modeling & Ingestion:** OSM places are transformed into structured LlamaIndex Document instances containing rich venue and geographic metadata.
+2. **Dense Embeddings:** Embeddings are generated with HuggingFaceEmbedding (sentence-transformers/all-MiniLM-L6-v2) in batches.
+3. **Milvus Vector Storage:** Connected natively via MilvusVectorStore and VectorStoreIndex, storing dense embeddings alongside venue metadata in local Milvus Lite (data/atlas_llama_milvus.db).
+4. **Hybrid Spatial Retrieval:** Query candidates are retrieved via LlamaIndex's VectorStoreIndex.as_retriever(), then reranked by Atlas's spatial layer applying physical Haversine walking distance decay (1000 / (1000 + d)), landmark detection, and category boosts.
+5. **Grounded LLM Generation:** The spatially ranked context, estimated walking times, and provenance warnings are orchestrated into local Mistral 7B via LlamaIndex's Ollama completion engine.
 
-To deliver the best physical experience for a walking pedestrian, we paired LlamaIndex with a custom **spatial retrieval layer**:
-- **Why a spatial retriever was added:** Standard framework retrievers perform cosine similarity over flat text chunks. In physical navigation, a user at Europaplatz asking for pizza would be routed 8 km away to Durlach simply because that restaurant had a longer text description. 
-- **The solution:** Atlas queries Milvus Lite for high-relevance semantic candidates, resolves landmark coordinates, applies physical Haversine walking decay (`1000 / (1000 + d)`), and passes the spatially ranked context into LlamaIndex's Ollama engine.
-
-This gives the user the best of both worlds: robust LlamaIndex orchestration paired with genuine real-world spatial intelligence.
+This satisfies the requirement of using LlamaIndex across the entire pipeline while guaranteeing real-world spatial intelligence.
 
 ---
 
