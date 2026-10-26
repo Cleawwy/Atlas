@@ -75,7 +75,7 @@ Atlas decouples semantic intent from spatial geography:
 In software that guides people through physical spaces, user experience failures carry real human costs:
 
 ### 1. The Cost of Hallucinations
-In document search, a hallucinated sentence is a minor correction. In local navigation, **a hallucination has immediate physical consequences**: an end user walks 15 minutes through the rain with luggage or children, arrives at an empty storefront or a closed venue, and their trust is broken permanently.
+In document search, a hallucinated sentence is a minor correction. In local navigation, **a hallucination has immediate physical consequences**: a person walks 15 minutes through the rain with luggage or children, arrives at an empty storefront or a closed venue, and trust is broken permanently.
 - **Design Response:** Confidence guardrails and strict prompt grounding ensure Atlas openly admits when an exact cuisine (e.g. Peruvian food) is absent from Karlsruhe's dataset, rather than inventing plausible-sounding recommendations.
 
 ### 2. Time Budgets over Vector Scores
@@ -100,22 +100,20 @@ Forcing a user to copy-paste coordinates into external apps adds friction. Every
 | **Local LLM** | Quantized Mistral 7B (Q4_K_M via Ollama) | Keeps VRAM consumption at ~4.5 GB, leaving ample headroom for embedding models and vector queries | Slight stylistic trade-off versus 15 GB unquantized fp16 |
 | **Data Quality** | Explicit missing-data warnings over hallucination | Prevents sending users to nonexistent venues when data is sparse | Assistant refuses to guess when data is missing |
 
-### Framework Integration: LlamaIndex & Spatial RAG
+### LlamaIndex & Spatial Retrieval Architecture
 
-Atlas integrates **LlamaIndex** end-to-end (llama-index-core, llama-index-embeddings-huggingface, llama-index-vector-stores-milvus, llama-index-llms-ollama) connecting document loading, dense embeddings, Milvus Lite vector storage, query candidate processing, and response generation:
-1. **Document Modeling & Ingestion:** OSM places are transformed into structured LlamaIndex Document instances containing rich venue and geographic metadata.
-2. **Dense Embeddings:** Embeddings are generated with HuggingFaceEmbedding (sentence-transformers/all-MiniLM-L6-v2) in batches.
-3. **Milvus Vector Storage:** Connected natively via MilvusVectorStore and VectorStoreIndex, storing dense embeddings alongside venue metadata in local Milvus Lite (data/atlas_llama_milvus.db).
-4. **Hybrid Spatial Retrieval:** Query candidates are retrieved via LlamaIndex's VectorStoreIndex.as_retriever(), then reranked by Atlas's spatial layer applying physical Haversine walking distance decay (1000 / (1000 + d)), landmark detection, and category boosts.
-5. **Grounded LLM Generation:** The spatially ranked context, estimated walking times, and provenance warnings are orchestrated into local Mistral 7B via LlamaIndex's Ollama completion engine.
+LlamaIndex manages document embeddings and local Mistral 7B inference, while spatial ranking runs through a decoupled Haversine layer.
 
-This satisfies the requirement of using LlamaIndex across the entire pipeline while guaranteeing real-world spatial intelligence.
-
+Retrieval operates in two stages:
+- **Semantic Candidate Filtering:** LlamaIndex queries Milvus Lite for the top 15 text-relevant POIs using `sentence-transformers/all-MiniLM-L6-v2` dense embeddings.
+- **Spatial Reranking:** Candidate coordinates are resolved against the reference landmark. Haversine distance is calculated for each venue and scaled using an inverse-distance walking decay:
+  $$\text{Final Score} = \text{CosineSimilarity} \times \frac{1000}{1000 + d_\text{meters}}$$
+- **Response Generation:** The reranked candidates—complete with calculated walking durations (~80 m/min) and verified opening hours—are passed to Mistral 7B via LlamaIndex's Ollama engine.
 ---
 
 ## Benchmark Results & Visual Evidence
 
-The system was evaluated against 5 real-world query categories across diverse end-user scenarios.
+The system was evaluated against 5 query categories covering everyday navigation and edge cases.
 
 ---
 
